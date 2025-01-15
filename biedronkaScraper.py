@@ -16,6 +16,7 @@ def scrapeImages(base_url, output_folder):
         previous_page_content = None
         identical_page_count = 0
         downloaded_images = set()
+        first_offer_processed = False
 
         links_with_images = page.locator("a:has(img)")
         for i in range(links_with_images.count()):
@@ -30,11 +31,12 @@ def scrapeImages(base_url, output_folder):
                 specific_output_folder = os.path.join(output_folder, date_range_shop)
                 os.makedirs(specific_output_folder, exist_ok=True)
 
-                if datetime_object < datetime.now():
+                if datetime_object < datetime.now() and first_offer_processed:
                     continue
                 else:
                     print("Accessing link")
                     page.wait_for_selector('body')
+                    first_offer_processed = True
                     while True:
                         pagination_url = f"{href}#page={page_number}"
                         print(f"Attempting to scrape: {pagination_url}")
@@ -86,7 +88,4 @@ def scrapeImages(base_url, output_folder):
 
 
 output_directory = "C:\\Users\\Marta\\Desktop\\scrape"
-# folders = os.listdir(output_directory)
-# for folder in folders:
-#     shutil.rmtree(os.path.join(output_directory, folder))
 scrapeImages("https://www.biedronka.pl/pl/gazetki", output_directory)

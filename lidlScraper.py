@@ -2,7 +2,7 @@ from playwright.sync_api import sync_playwright
 import os
 import requests
 import re
-import shutil
+import time
 
 def scrape_images(base_url, output_folder):
     os.makedirs(output_folder, exist_ok=True)
@@ -14,6 +14,7 @@ def scrape_images(base_url, output_folder):
         page.goto(base_url)
 
         page.wait_for_selector("section:has-text('Nasze gazetki')")
+        time.sleep(2)
 
         offer_elements = page.locator("section:has-text('Nasze gazetki') a:has-text('OFERTA WAŻNA OD')")
         offer_count = offer_elements.count()
@@ -40,7 +41,7 @@ def scrape_images(base_url, output_folder):
             if date_match:
                 date_range = f"od-{date_match.group(1)}-do-{date_match.group(2)}"
                 print(f"Extracted date range: {date_range}")
-                specific_output_folder = os.path.join(output_folder, date_range)
+                specific_output_folder = os.path.join(output_folder, date_range+"lidl")
                 os.makedirs(specific_output_folder, exist_ok=True)
             else:
                 print("Could not extract date range from the URL. Skipping this offer.")
