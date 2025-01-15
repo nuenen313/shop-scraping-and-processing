@@ -9,6 +9,7 @@ def process_file(files_directory):
     folders_list = os.listdir(files_directory)
     i=0
     db_data={}
+    firebase_manager.delete_storage_data()
     for folder in folders_list:
         if "biedronka" in folder:
             shop = "biedronka"
@@ -52,7 +53,7 @@ def process_file(files_directory):
 if __name__ == "__main__":
     firebase_manager = FirebaseManager(
         service_account_key="serviceAccountKey.json",
-        bucket_name="alkoalertfirebase.firebasestorage.app",
-        database_url="https://alkoalertfirebase-default-rtdb.europe-west1.firebasedatabase.app/"
+        bucket_name="bucket-name",
+        database_url="database-url"
     )
     process_file("C:\\Users\\Marta\\Desktop\\scrape\\")

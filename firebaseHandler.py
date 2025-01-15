@@ -42,6 +42,24 @@ class FirebaseManager:
         print(f"Image uploaded to {public_url}")
         return public_url
 
+    def delete_storage_data(self):
+        """
+        Deletes all files from Firebase Storage bucket/
+
+        :param storage_path: Path in Firebase Storage where the images need to be deleted from.
+        :return:
+        """
+        bucket = storage.bucket()
+        blob_folder = "images/"
+        blobs = bucket.list_blobs(prefix=blob_folder)
+        for blob in blobs:
+            if blob.name != blob_folder:
+                try:
+                    print(' * deleting', blob.name)
+                    blob.delete()
+                except Exception as e:
+                    print(f"Error deleting {blob.name}: {e}")
+
     def upload_data(self, data, reference_path='offers'):
         """
         Uploads a dictionary to Firebase Realtime Database.
