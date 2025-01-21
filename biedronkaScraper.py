@@ -10,7 +10,7 @@ import time
 def scrapeImages(base_url, output_folder):
     os.makedirs(output_folder, exist_ok=True)
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)
         page = browser.new_page()
 
         page.goto(base_url)
@@ -39,7 +39,10 @@ def scrapeImages(base_url, output_folder):
                     page.wait_for_selector('body')
                     offers_processed += 1
                     while True:
-                        pagination_url = f"{href}#page={page_number}"
+                        if href.endswith("page=1"):
+                            pagination_url = f"{href[:-1]}{page_number}"
+                        else:
+                            pagination_url = f"{href}#page{page_number}"
                         print(f"Attempting to scrape: {pagination_url}")
                         page.goto(pagination_url)
                         time.sleep(1)
@@ -119,7 +122,10 @@ def scrapeTaniWeekendImages(base_url, output_folder):
                     page.wait_for_selector('body')
                     offers_processed += 1
                     while True:
-                        pagination_url = f"{href}#page={page_number}"
+                        if href.endswith("page=1"):
+                            pagination_url = f"{href[:-1]}{page_number}"
+                        else:
+                            pagination_url = f"{href}#page{page_number}"
                         print(f"Attempting to scrape: {pagination_url}")
                         page.goto(pagination_url)
                         time.sleep(1)
@@ -196,7 +202,11 @@ def scrapeAlcoholImages(base_url, output_folder):
                     page.wait_for_selector('body')
                     offers_processed += 1
                     while True:
-                        pagination_url = f"{href[:-1]}{page_number}"
+                        if href.endswith("page=1"):
+                            pagination_url = f"{href[:-1]}{page_number}"
+                        else:
+                            print(href, "doesntendwith")
+                            pagination_url = f"{href}#page={page_number}"
                         print(f"Attempting to scrape: {pagination_url}")
                         page.goto(pagination_url)
                         try:

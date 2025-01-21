@@ -11,12 +11,12 @@ def process_file(files_directory, shop, i, db_data):
     wino_typ_list = ["grzaniec", "zbojeckie", "wino", "wina", "grza", "grono", "monte", "monastrell", "jumil",
                      "porto tawny", "edelkirsch", "witosha", "montelago", "jumilla", "wytrawne", "czerwone", "białe",
                      "masseria", "primitivo", "moscato", "chardonnay", "budowa", "negroamaro", "premirivo",
-                     "rześkość", "słodycz", "półwyt", "astrale", "chianti", "custoza", "vignon", "półsłodkie", "monte",
+                     "rześkość", "półwyt", "astrale", "chianti", "custoza", "vignon", "półsłodkie", "monte",
                      "mogen david", "concord", "mionetto", "carlo rossi", "fresco"]
     szampan_typ_list = ["secco", "dorato", "michel", "uperiore"]
     aperitif_typ_list = ["martini", "bianco", "martin", "erol", "aperitif", "aperol", "rosso", "fiero"]
     wodka_typ_list = ["vodka", "umbras", "wódka", "absolut", "stumbras", "stock", "bocian", "bols", "marine", "tadeusz",
-                      "wyborów", "wyboro", "żubrówka", "wodka", "żoładkowa", "amundsen", "gorzka", "ytrynowka",
+                      "wyborów", "wyboro", "żubrówka", "wodka", "żoładkowa", "amundsen", "ytrynowka",
                       "ytrynówka", "barmańska", "zołądkowa", "zołądkoma", "wiśniów"]
     likier_typ_list = ["czekolada", "czekolady", "likier", "likiter", "jagermeister", "advocaat", "karmel",
                        "coffee layered", "baileys", "sheri", "johanneswald", "diplomat"]
@@ -47,30 +47,31 @@ def process_file(files_directory, shop, i, db_data):
                                                 cv2.THRESH_BINARY_INV, 11, 2)
                 bnt = cv2.bitwise_not(thresh1)
                 text = pytesseract.image_to_string(bnt, lang='pol', config='--psm 11')
-                if len(text) > 100:
-                    if any(word in text.lower() for word in piwo_typ_list):
+                if len(text) > 200:
+                    if any(re.search(r'\b' + re.escape(word) + r'\b', text.lower()) for word in piwo_typ_list):
                         type = "piwo"
-                    elif any(word in text.lower() for word in wino_typ_list):
-                        type = "wino"
-                    elif any(word in text.lower() for word in szampan_typ_list):
-                        type = "szampan"
-                    elif any(word in text.lower() for word in aperitif_typ_list):
-                        type = "aperitif"
-                    elif any(word in text.lower() for word in wodka_typ_list):
-                        type = "wódka"
-                    elif any(word in text.lower() for word in likier_typ_list):
-                        type ="likier"
-                    elif any(word in text.lower() for word in whiskey_typ_list):
+                    elif any(re.search(r'\b' + re.escape(word) + r'\b', text.lower()) for word in whiskey_typ_list):
                         type = "whiskey"
-                    elif any(word in text.lower() for word in gin_typ_list):
+                    elif any(re.search(r'\b' + re.escape(word) + r'\b', text.lower()) for word in gin_typ_list):
                         type = "gin"
-                    elif any(word in text.lower() for word in rum_typ_list):
+                    elif any(re.search(r'\b' + re.escape(word) + r'\b', text.lower()) for word in rum_typ_list):
                         type = "rum"
-                    elif any(word in text.lower() for word in brandy_typ_list):
+                    elif any(re.search(r'\b' + re.escape(word) + r'\b', text.lower()) for word in brandy_typ_list):
                         type = "brandy"
+                    elif any(re.search(r'\b' + re.escape(word) + r'\b', text.lower()) for word in wino_typ_list):
+                        type = "wino"
+                    elif any(re.search(r'\b' + re.escape(word) + r'\b', text.lower()) for word in szampan_typ_list):
+                        type = "szampan"
+                    elif any(re.search(r'\b' + re.escape(word) + r'\b', text.lower()) for word in aperitif_typ_list):
+                        type = "aperitif"
+                    elif any(re.search(r'\b' + re.escape(word) + r'\b', text.lower()) for word in wodka_typ_list):
+                        type = "wódka"
+                    elif any(re.search(r'\b' + re.escape(word) + r'\b', text.lower()) for word in likier_typ_list):
+                        type ="likier"
                     else:
                         type = "inne"
                     print(type)
+                    print(text)
                     key = f"offer{i}"
                     db_data[key] = {
                         "shop": shop,
@@ -78,7 +79,6 @@ def process_file(files_directory, shop, i, db_data):
                         "type": type,
                         "storage_path": ""
                     }
-                    print(text)
                     storage_url = f"images/{date}_{shop}_{file}"
                     image_url = firebase_manager.upload_image(
                         image_path=filename,
@@ -94,7 +94,6 @@ def process_file(files_directory, shop, i, db_data):
                 date = re.match(pattern, folder).group(1)
             except AttributeError:
                 continue
-            print(date)
             files_list = os.listdir(folder_dir)
             for file in files_list:
                 filename = os.path.join(files_directory,folder,file)
@@ -106,7 +105,7 @@ def process_file(files_directory, shop, i, db_data):
                                                 cv2.THRESH_BINARY_INV, 11, 2)
                 bnt = cv2.bitwise_not(thresh1)
                 text = pytesseract.image_to_string(bnt, lang='pol', config='--psm 11')
-                if re.search(r'\b(piwo|alkoholu)\b', text, re.IGNORECASE):
+                if (re.search(r'\b(piwo|alkoholu)\b', text, re.IGNORECASE)) and len(text)>200:
                     type = "piwo"
                     key = f"offer{i}"
                     db_data[key] = {
@@ -115,6 +114,7 @@ def process_file(files_directory, shop, i, db_data):
                         "type": type,
                         "storage_path": ""
                     }
+                    print(text)
                     storage_url = f"images/{date}_{shop}_{file}"
                     image_url = firebase_manager.upload_image(
                          image_path=filename,
@@ -130,8 +130,8 @@ def process_file(files_directory, shop, i, db_data):
 if __name__ == "__main__":
     firebase_manager = FirebaseManager(
         service_account_key="serviceAccountKey.json",
-        bucket_name="alkoalertfirebase.firebasestorage.app",
-        database_url="https://alkoalertfirebase-default-rtdb.europe-west1.firebasedatabase.app/"
+        bucket_name="bucket-name",
+        database_url="firebase-url"
     )
     firebase_manager.delete_storage_data()
     i = 0
