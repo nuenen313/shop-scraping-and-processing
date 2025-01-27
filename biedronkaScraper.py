@@ -93,7 +93,7 @@ def scrapeImages(base_url, output_folder):
 def scrapeTaniWeekendImages(base_url, output_folder):
     os.makedirs(output_folder, exist_ok=True)
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)
         page = browser.new_page()
 
         page.goto(base_url)
@@ -176,7 +176,7 @@ def scrapeTaniWeekendImages(base_url, output_folder):
 def scrapeAlcoholImages(base_url, output_folder):
     os.makedirs(output_folder, exist_ok=True)
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)
         page = browser.new_page()
         page.goto(base_url)
         page_number = 1
