@@ -5,7 +5,7 @@ from firebase_admin import credentials, storage, db
 class FirebaseManager:
     def __init__(self, service_account_key, bucket_name, database_url):
         """
-        Initialize the FirebaseManager with the required credentials, bucket, and database URL.
+        Initialize the FirebaseManager with credentials, bucket, and database URL.
 
         :param service_account_key: Path to the service account key JSON file.
         :param bucket_name: Firebase Storage bucket name.
